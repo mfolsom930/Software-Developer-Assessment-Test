@@ -1,0 +1,153 @@
+<?php
+//------------------------
+//Software Developer Assessment Test 
+//Matthew S Folsom
+//06-21-2021
+
+
+// Thank you for the opportunity to be considered for this position
+
+
+//------------------------
+
+
+
+
+$ch = curl_init();
+
+$url = "https://api.sightmap.com/v1/assets/1273/multifamily/units";
+$apiKey = '7d64ca3869544c469c3e7a586921ba37';
+$headers = array('API-Key: '.$apiKey);
+
+
+curl_setopt($ch, CURLOPT_URL, $url);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+$resp = curl_exec($ch);
+
+$result = json_decode($resp, true);
+
+
+curl_close($ch);
+
+
+
+$areaArray = array();
+$noAreaArray = array();
+
+ foreach ($result["data"] as $key => $value){
+     
+   if ($result["data"][$key]["area"] == 1){
+            $myData = array(
+            'Unit Number' => $result['data'][$key]['unit_number'], 
+            'Area (SQFT)' => $result['data'][$key]['area'], 
+            'Updated At Date' => $result['data'][$key]['updated_at']);
+            $noAreaArray[] = $myData;
+            
+        } else {
+            $myData = array(
+            'Unit Number' => $result['data'][$key]['unit_number'], 
+            'Area (SQFT)' => $result['data'][$key]['area'], 
+            'Updated At Date' => $result['data'][$key]['updated_at']);
+            $areaArray[] = $myData;
+        }
+    }
+
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>unitlist</title>
+    <link rel="stylesheet" href="https://use.typekit.net/mmn2kpj.css">
+    <style>
+#table1 {
+  font-family: forma-djr-micro, Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#table1 td, #table1 th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#table1 tr:nth-child(even){background-color: #f2f2f2;}
+
+#table1 tr:hover {background-color: #ddd;}
+
+#table1 th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #263349;
+  color: white;
+}
+#table2 {
+  font-family: forma-djr-micro, Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#table2 td, #table2 th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#table2 tr:nth-child(even){background-color: #f2f2f2;}
+
+#table2 tr:hover {background-color: #ddd;}
+
+#table2 th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #263349;
+  color: white;
+}
+</style>
+</head>
+<body>
+
+
+<?php if (count($areaArray) > 0): ?>
+<table id = table1>
+  <thead>
+    <tr>
+      <th><?php echo implode('</th><th>', array_keys(current($areaArray))); ?></th>
+    </tr>
+  </thead>
+  <tbody>
+<?php foreach ($areaArray as $row): array_map('htmlentities', $row); ?>
+    <tr>
+      <td><?php echo implode('</td><td>', $row); ?></td>
+    </tr>
+<?php endforeach; ?>
+  </tbody>
+</table>
+<?php endif; ?>
+
+<?php if (count($noAreaArray) > 0): ?>
+<table id = table2>
+  <thead>
+    <tr>
+      <th><?php echo implode('</th><th>', array_keys(current($noAreaArray))); ?></th>
+    </tr>
+  </thead>
+  <tbody>
+<?php foreach ($noAreaArray as $row): array_map('htmlentities', $row); ?>
+    <tr>
+      <td><?php echo implode('</td><td>', $row); ?></td>
+    </tr>
+<?php endforeach; ?>
+  </tbody>
+</table>
+<?php endif; ?>
+
+
+
+</body>
+</html>
